@@ -86,6 +86,13 @@ CLASS_BUFF_DICT = {
     'duration': 4,
     'priority': 7,
   },
+  'Esoteric_Prepared_4': {
+    'name': 'esoteric_prepared',
+    'buff_type': 'stat',
+    'effect': 'esoteric_prepared_4',
+    'duration': 999999,
+    'priority': 7,
+  },
 }
 
 ######## Finalize Skill #########
@@ -143,6 +150,16 @@ def activate_energy_combustion(buff_manager: BuffManager, skill_manager: SkillMa
       skill.update_attribute('remaining_cooldown', seconds_to_ticks(20))
   skill_manager.apply_function(cooldown_reduction)
 
+# 버블 활성화
+def prepare_esoteric(buff_manager: BuffManager, skill_manager: SkillManager, skill_on_use: Skill):
+  if not buff_manager.is_buff_exists('esoteric_prepared'):
+    buff_manager.register_buff(CLASS_BUFF_DICT['Esoteric_Prepared_4'], skill_on_use)
+
+# 버블 사용
+def esoteric_used(buff_manager: BuffManager, skill_manager: SkillManager, skill_on_use: Skill):
+  buff_manager.unregister_buff('esoteric_prepared')
+
+
 ######## Buff bodies ########
 def specialization(character: CharacterLayer, skill: Skill, buff: Buff):
     s = character.get_attribute('specialization')
@@ -176,3 +193,9 @@ def ap_buff_1(character: CharacterLayer, skill: Skill, buff: Buff):
 def ap_buff_2(character: CharacterLayer, skill: Skill, buff: Buff):
   c_aap = character.get_attribute('additional_attack_power')
   character.update_attribute('additional_attack_power', c_aap + 0.276 * (1 + c_aap))
+
+# 버블 뎀증 버프
+def esoteric_prepared_4(character: CharacterLayer, skill: Skill, buff: Buff):
+  if skill.get_attribute('identity_type') == 'Esoteric':
+      s_dm = skill.get_attribute('damage_multiplier')
+      skill.update_attribute('damage_multiplier', s_dm * 1.7)
